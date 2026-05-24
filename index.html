@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'INSTANT — Il ne reste que maintenant</title>
+<meta name="description" content="Une expérience visuelle unique. Chaque seconde compte. Rejoins des milliers de personnes qui vivent l'instant présent.">
+<meta property="og:title" content="L'INSTANT — Il ne reste que maintenant">
+<meta property="og:description" content="Tu n'as que ce moment. Qu'est-ce que tu vas en faire ?">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0a0a08;
+    --paper: #f5f0e8;
+    --red: #c8392b;
+    --gold: #d4a843;
+    --muted: #8a8070;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Crimson Pro', serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed; top: 0; left: 0;
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0;
+    width: 40px; height: 40px;
+    border: 1px solid rgba(200,57,43,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease;
+    transform: translate(-16px, -16px);
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.6;
+  }
+
+  /* CANVAS BACKGROUND */
+  #bg-canvas {
+    position: fixed; inset: 0;
+    z-index: 0;
+    opacity: 0.15;
+  }
+
+  /* MAIN SECTIONS */
+  section {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(6rem, 22vw, 22rem);
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+    position: relative;
+  }
+
+  .hero-title span {
+    display: block;
+    color: var(--red);
+    font-size: 0.42em;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-sub {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    color: var(--muted);
+    margin-top: 2rem;
+    max-width: 600px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.8s forwards;
+  }
+
+  /* CLOCK */
+  #clock-container {
+    margin-top: 4rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.1s forwards;
+  }
+
+  #clock {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(2rem, 8vw, 7rem);
+    font-weight: 700;
+    color: var(--paper);
+    letter-spacing: 0.05em;
+    position: relative;
+  }
+
+  #clock .colon {
+    animation: blink 1s step-end infinite;
+    color: var(--red);
+  }
+
+  #date-display {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.65rem, 1.3vw, 0.9rem);
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  /* SCROLL CTA */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 2s forwards;
+  }
+  .scroll-hint span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+  }
+  .scroll-arrow {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ─── COUNTER ─── */
+  #counter-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--paper);
+    color: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #counter-section::before {
+    content: 'MAINTENANT';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30vw;
+    color: rgba(0,0,0,0.04);
+    white-space: nowrap;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 3rem;
+  }
+
+  .counter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 3rem 5rem;
+    max-width: 900px;
+    margin: 0 auto 3rem;
+  }
+
+  .counter-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .counter-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 8vw, 6rem);
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .counter-label {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* PROGRESS BARS */
+  .year-progress {
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.7rem;
+  }
+
+  .progress-label span:first-child {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .progress-label span:last-child {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--red);
+  }
+
+  .progress-track {
+    height: 3px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 2px;
+    transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 0;
+  }
+
+  /* ─── MANIFESTO ─── */
+  #manifesto {
+    flex-direction: column;
+    padding: 8rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .manifesto-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .manifesto-line {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 9vw, 8rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+  }
+
+  .manifesto-line.alt {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--paper);
+    text-align: right;
+    transform: translateX(30px);
+  }
+
+  .manifesto-line.red { color: var(--red); -webkit-text-stroke: none; }
+
+  .manifesto-line.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ─── SHARE ─── */
+  #share-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 6rem 2rem 8rem;
+    gap: 3rem;
+  }
+
+  .share-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+
+  .share-sub {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--muted);
+    max-width: 500px;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 1rem 2.5rem;
+    border: none;
+    cursor: none;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: var(--paper);
+  }
+
+  .btn-primary:hover {
+    background: #a82d20;
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid rgba(245,240,232,0.3);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--paper);
+    transform: translateY(-2px);
+  }
+
+  /* VISITOR COUNT */
+  #live-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    background: #4caf50;
+    border-radius: 50%;
+    animation: livePulse 2s ease infinite;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid rgba(245,240,232,0.08);
+  }
+
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+  }
+
+  /* HORIZONTAL MARQUEE */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid rgba(245,240,232,0.1);
+    border-bottom: 1px solid rgba(245,240,232,0.1);
+    padding: 0.8rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 25s linear infinite;
+    gap: 0;
+  }
+
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    padding: 0 3rem;
+    white-space: nowrap;
+  }
+
+  .marquee-item.red { color: var(--red); }
+
+  /* ─── KEYFRAMES ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { transform: scaleY(1); opacity: 1; }
+    50% { transform: scaleY(0.5); opacity: 0.4; }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes livePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.6); }
+    50% { box-shadow: 0 0 0 6px rgba(76,175,80,0); }
+  }
+
+  /* SELECTION */
+  ::selection { background: var(--red); color: var(--paper); }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .counter-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <p class="hero-eyebrow">Une expérience · Lundi 18 mai 2026</p>
+
+  <h1 class="hero-title">
+    L'INSTANT
+    <span>Il ne reste que maintenant</span>
+  </h1>
+
+  <p class="hero-sub">
+    Le temps passe. Chaque seconde disparaît pour toujours.<br>
+    Cette page est la preuve que tu es vivant·e.
+  </p>
+
+  <div id="clock-container">
+    <div id="clock">
+      <span id="h">00</span><span class="colon">:</span><span id="m">00</span><span class="colon">:</span><span id="s">00</span>
+    </div>
+    <div id="date-display"></div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Descends</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="marquee-track"></div>
+</div>
+
+<!-- ═══ COUNTER ═══ -->
+<section id="counter-section">
+  <p class="section-label">Depuis minuit aujourd'hui</p>
+
+  <div class="counter-grid">
+    <div class="counter-item">
+      <div class="counter-num" id="cnt-seconds">0</div>
+      <div class="counter-label">secondes écoulées</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" id="cnt-breaths">0</div>
+      <div class="counter-label">respirations prises</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" id="cnt-heartbeats">0</div>
+      <div class="counter-label">battements de cœur</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" id="cnt-blinks">0</div>
+      <div class="counter-label">clignements d'yeux</div>
+    </div>
+  </div>
+
+  <div class="year-progress">
+    <div class="progress-label">
+      <span>Année 2026 écoulée</span>
+      <span id="year-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="year-bar"></div>
+    </div>
+
+    <div class="progress-label">
+      <span>Journée écoulée</span>
+      <span id="day-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="day-bar"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MANIFESTO ═══ -->
+<section id="manifesto">
+  <div class="manifesto-lines">
+    <div class="manifesto-line">TU ES LÀ.</div>
+    <div class="manifesto-line alt">MAINTENANT.</div>
+    <div class="manifesto-line">PAS HIER.</div>
+    <div class="manifesto-line alt">PAS DEMAIN.</div>
+    <div class="manifesto-line red">ICI.</div>
+    <div class="manifesto-line">RESPIRE.</div>
+  </div>
+</section>
+
+<!-- ═══ SHARE ═══ -->
+<section id="share-section">
+  <p class="section-label">Partage l'instant</p>
+  <h2 class="share-title">Envoie ça<br>à quelqu'un.</h2>
+  <p class="hero-sub" style="opacity:1">
+    Pas pour impressionner. Juste pour dire :<br>
+    <em>hey, tu existes, c'est déjà fou.</em>
+  </p>
+
+  <div class="share-buttons">
+    <a class="btn btn-primary" href="https://twitter.com/intent/tweet?text=Je+viens+de+trouver+ce+site+sur+le+temps+qui+passe+🕐+Fascinant+%F0%9F%94%A5&url=https://linstant.now" target="_blank" rel="noopener">
+      Partager sur X
+    </a>
+    <a class="btn btn-outline" href="https://wa.me/?text=Regarde+ce+site+sur+l'instant+présent+→+https://linstant.now" target="_blank" rel="noopener">
+      Envoyer sur WhatsApp
+    </a>
+    <button class="btn btn-outline" id="copy-btn" onclick="copyLink()">
+      Copier le lien
+    </button>
+  </div>
+
+  <div id="live-count">
+    <div class="live-dot"></div>
+    <span id="visitor-text">1 247 personnes vivent cet instant</span>
+  </div>
+</section>
+
+<!-- FOOTER MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="marquee-track-2" style="animation-direction:reverse;"></div>
+</div>
+
+<footer>
+  <p>L'INSTANT · Chaque milliseconde est unique · 2026</p>
+</footer>
+
+<script>
+  // ─── CURSOR ───
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+  });
+
+  (function animRing() {
+    rx += (mx - rx - 20) * 0.12;
+    ry += (my - ry - 20) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a, button, .btn').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.transform += ' scale(2)'; ring.style.transform += ' scale(1.5)'; });
+    el.addEventListener('mouseleave', () => {});
+  });
+
+  // ─── BACKGROUND CANVAS ───
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const particles = Array.from({length: 80}, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: Math.random() * 1.5 + 0.3,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    a: Math.random()
+  }));
+
+  function drawBg() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      p.x = (p.x + p.vx + W) % W;
+      p.y = (p.y + p.vy + H) % H;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212,168,67,${p.a * 0.6})`;
+      ctx.fill();
+    });
+
+    // Connexions
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i+1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(212,168,67,${(1 - d/120) * 0.15})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(drawBg);
+  }
+  drawBg();
+
+  // ─── CLOCK ───
+  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('h').textContent = String(now.getHours()).padStart(2,'0');
+    document.getElementById('m').textContent = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('s').textContent = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('date-display').textContent =
+      `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // ─── COUNTERS ───
+  function getSecondsSinceMidnight() {
+    const now = new Date();
+    return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  }
+
+  function formatNum(n) {
+    return n.toLocaleString('fr-FR');
+  }
+
+  function updateCounters() {
+    const s = getSecondsSinceMidnight();
+    document.getElementById('cnt-seconds').textContent    = formatNum(s);
+    document.getElementById('cnt-breaths').textContent    = formatNum(Math.floor(s / 4));
+    document.getElementById('cnt-heartbeats').textContent = formatNum(Math.floor(s * 1.17));
+    document.getElementById('cnt-blinks').textContent     = formatNum(Math.floor(s * 0.28));
+
+    // Year progress
+    const now   = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const end   = new Date(now.getFullYear() + 1, 0, 1);
+    const yPct  = ((now - start) / (end - start) * 100).toFixed(3);
+    document.getElementById('year-pct').textContent = yPct + '%';
+    document.getElementById('year-bar').style.width = yPct + '%';
+
+    const dayStart = new Date(now); dayStart.setHours(0,0,0,0);
+    const dPct = ((now - dayStart) / 86400000 * 100).toFixed(3);
+    document.getElementById('day-pct').textContent = dPct + '%';
+    document.getElementById('day-bar').style.width = dPct + '%';
+  }
+
+  updateCounters();
+  setInterval(updateCounters, 1000);
+
+  // ─── LIVE VISITOR SIMULATION ───
+  let visitors = 1247;
+  function updateVisitors() {
+    visitors += Math.floor(Math.random() * 5) - 1;
+    if (visitors < 800) visitors = 800;
+    document.getElementById('visitor-text').textContent =
+      formatNum(visitors) + ' personnes vivent cet instant';
+  }
+  setInterval(updateVisitors, 4000);
+
+  // ─── MANIFESTO SCROLL ───
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.manifesto-line').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.12) + 's';
+    observer.observe(el);
+  });
+
+  // ─── MARQUEE ───
+  const words = ['MAINTENANT','·','VIS','·','RESPIRE','·','PRÉSENT','·','CE MOMENT','·','MAINTENANT','·','VIS','·','RESPIRE','·','PRÉSENT','·','CE MOMENT','·'];
+  function buildMarquee(id, color) {
+    const track = document.getElementById(id);
+    const items = [...words, ...words].map((w, i) => {
+      const span = document.createElement('span');
+      span.className = 'marquee-item' + (i % 5 === 0 ? ' red' : '');
+      span.textContent = w;
+      return span;
+    });
+    items.forEach(s => track.appendChild(s));
+  }
+  buildMarquee('marquee-track', false);
+  buildMarquee('marquee-track-2', true);
+
+  // ─── COPY LINK ───
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copié ✓';
+      setTimeout(() => btn.textContent = 'Copier le lien', 2000);
+    });
+  }
+
+  // ─── PROGRESS BAR ANIMATE ON VIEW ───
+  const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        updateCounters();
+      }
+    });
+  }, { threshold: 0.3 });
+  barObserver.observe(document.getElementById('counter-section'));
+</script>
+</body>
+</html>

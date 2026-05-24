@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NovaPulse AI — The AI-native newsroom</title>
+  <meta name="description" content="NovaPulse AI aggregates, rewrites and publishes trending stories across AI, Tech, Africa, Finance, Business and Viral news."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0ede8;
+      --muted: #6b6860;
+      --accent: #e8d5a3;
+      --accent2: #c9773a;
+      --ai: #7ec8c8;
+      --africa: #d4895a;
+      --tech: #8fb4e8;
+      --finance: #a8d8a8;
+      --business: #d4a0d4;
+      --viral: #e87070;
+      --religion: #d4c88a;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── TICKER ── */
+    .ticker {
+      background: var(--accent2);
+      color: #fff;
+      padding: 6px 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 80px;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .ticker-label {
+      background: rgba(0,0,0,0.25);
+      padding: 2px 10px;
+      border-radius: 2px;
+      margin-right: 10px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(20px);
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 40px;
+      height: 64px;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(200,119,58,0.6); }
+      50% { box-shadow: 0 0 0 6px rgba(200,119,58,0); }
+    }
+    nav {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    nav a:hover { color: var(--text); background: var(--surface2); }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .btn-search {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; padding: 8px; border-radius: 4px;
+      transition: color 0.2s;
+    }
+    .btn-search:hover { color: var(--text); }
+    .btn-signin {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 18px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-signin:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 92vh;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(200,119,58,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 20% 70%, rgba(126,200,200,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #0a0a0a 0%, #0f0e0c 100%);
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+    .hero-content {
+      position: relative;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 120px 40px 80px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 80px;
+      align-items: end;
+    }
+    .hero-left {}
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(200,119,58,0.1);
+      border: 1px solid rgba(200,119,58,0.3);
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+    .live-dot {
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(48px, 7vw, 96px);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--accent2);
+      color: #fff;
+      padding: 13px 28px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #b8673a; transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      padding: 13px 28px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 48px;
+    }
+    .stat-item {}
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Hero right — featured article */
+    .hero-featured {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .hero-featured:hover { border-color: rgba(255,255,255,0.15); }
+    .hero-feat-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: linear-gradient(135deg, #1a1a1a, #2a2520);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+    .hero-feat-body { padding: 24px; }
+    .feat-cat {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ai);
+      margin-bottom: 10px;
+    }
+    .hero-feat-body h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .hero-feat-body p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .feat-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    .feat-meta span { display: flex; align-items: center; gap: 4px; }
+
+    /* ── SECTION LAYOUT ── */
+    .section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section-more {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── TRENDING STRIP ── */
+    .trending-strip {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .trending-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      overflow-x: auto;
+    }
+    .trending-inner::-webkit-scrollbar { display: none; }
+    .trending-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      white-space: nowrap;
+      padding-right: 24px;
+      border-right: 1px solid var(--border);
+    }
+    .trending-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .trending-item:hover { color: var(--text); }
+    .trending-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--accent2);
+      opacity: 0.6;
+    }
+
+    /* ── ARTICLES GRID ── */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .article-card {
+      background: var(--bg);
+      padding: 28px;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .article-card:hover { background: var(--surface); }
+    .card-cat {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cat-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .cat-ai { color: var(--ai); } .cat-ai .cat-dot { background: var(--ai); }
+    .cat-africa { color: var(--africa); } .cat-africa .cat-dot { background: var(--africa); }
+    .cat-tech { color: var(--tech); } .cat-tech .cat-dot { background: var(--tech); }
+    .cat-finance { color: var(--finance); } .cat-finance .cat-dot { background: var(--finance); }
+    .cat-business { color: var(--business); } .cat-business .cat-dot { background: var(--business); }
+    .cat-viral { color: var(--viral); } .cat-viral .cat-dot { background: var(--viral); }
+    .cat-religion { color: var(--religion); } .cat-religion .cat-dot { background: var(--religion); }
+
+    .article-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .article-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .card-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(232,213,163,0.08);
+      border-radius: 3px;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── FEATURED ROW (big + small) ── */
+    .featured-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .featured-big {
+      background: var(--bg);
+      padding: 40px;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      min-height: 320px;
+    }
+    .featured-big:hover { background: var(--surface); }
+    .featured-big h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .featured-big p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+    .featured-stack {
+      display: flex;
+      flex-direction: column;
+    }
+    .stack-item {
+      background: var(--bg);
+      padding: 24px 28px;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.2s;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .stack-item:last-child { border-bottom: none; }
+    .stack-item:hover { background: var(--surface); }
+    .stack-item h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .stack-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── CATEGORY FILTER ── */
+    .cat-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .cat-btn {
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .cat-btn:hover, .cat-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,213,163,0.06); }
+
+    /* ── NEWSLETTER ── */
+    .newsletter-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .newsletter-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 80px 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .newsletter-left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .newsletter-left h2 em { font-style: italic; color: var(--accent); }
+    .newsletter-left p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .newsletter-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .newsletter-form input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .newsletter-form input::placeholder { color: var(--muted); }
+    .newsletter-form input:focus { border-color: var(--accent); }
+    .newsletter-form button {
+      background: var(--accent2);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .newsletter-form button:hover { background: #b8673a; }
+    .form-note { font-size: 11px; color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 60px 40px 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-brand .logo { margin-bottom: 16px; display: inline-flex; }
+    .footer-brand p { font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 280px; }
+    .footer-col h4 {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--text); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.04em;
+    }
+    .footer-bottom a { color: var(--muted); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUp 0.7s ease forwards;
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up:nth-child(1) { animation-delay: 0.1s; }
+    .fade-up:nth-child(2) { animation-delay: 0.2s; }
+    .fade-up:nth-child(3) { animation-delay: 0.3s; }
+    .fade-up:nth-child(4) { animation-delay: 0.4s; }
+
+    /* ── ARTICLE PAGE ── */
+    .article-page { display: none; }
+    .article-page.active { display: block; }
+    .main-view { display: block; }
+    .main-view.hidden { display: none; }
+
+    .article-header {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 80px 40px 48px;
+    }
+    .article-breadcrumb {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .article-breadcrumb a { color: var(--muted); text-decoration: none; }
+    .article-breadcrumb a:hover { color: var(--accent); }
+    .article-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .article-header .lead {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .article-meta-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .article-body {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 40px 80px;
+    }
+    .article-body p {
+      font-size: 16px;
+      line-height: 1.85;
+      color: #c8c5be;
+      margin-bottom: 24px;
+    }
+    .article-body h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      margin: 48px 0 20px;
+      color: var(--text);
+    }
+    .article-body blockquote {
+      border-left: 3px solid var(--accent2);
+      padding: 16px 24px;
+      margin: 32px 0;
+      background: var(--surface);
+      font-style: italic;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      .header-inner { padding: 0 20px; grid-template-columns: 1fr auto; }
+      nav { display: none; }
+      .hero-content { grid-template-columns: 1fr; padding: 80px 20px 60px; gap: 40px; }
+      .hero-featured { display: none; }
+      .hero h1 { font-size: 48px; }
+      .hero-stats { gap: 24px; }
+      .section { padding: 60px 20px; }
+      .articles-grid { grid-template-columns: 1fr; }
+      .featured-row { grid-template-columns: 1fr; }
+      .featured-stack { flex-direction: row; overflow-x: auto; }
+      .stack-item { min-width: 240px; border-bottom: none; border-right: 1px solid var(--border); }
+      .newsletter-inner { grid-template-columns: 1fr; gap: 40px; padding: 60px 20px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      .trending-inner { padding: 16px 20px; }
+      .article-header, .article-body { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner">
+    <span><span class="ticker-label">LIVE</span> AI reshaping global newsrooms · 2M readers · 6 languages · Sub-second publish</span>
+    <span>🔥 Africa's tech surge: Lagos leads · Nairobi VC up 340% · Cape Town unicorn watch</span>
+    <span>📈 Markets rotate into AI infrastructure · Rate cuts imminent · 1.4nm silicon race</span>
+    <span>🌐 NovaPulse AI · The AI-native newsroom · Faster than a feed. Sharper than the crowd.</span>
+    <span><span class="ticker-label">LIVE</span> AI reshaping global newsrooms · 2M readers · 6 languages · Sub-second publish</span>
+    <span>🔥 Africa's tech surge: Lagos leads · Nairobi VC up 340% · Cape Town unicorn watch</span>
+    <span>📈 Markets rotate into AI infrastructure · Rate cuts imminent · 1.4nm silicon race</span>
+    <span>🌐 NovaPulse AI · The AI-native newsroom · Faster than a feed. Sharper than the crowd.</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="#" class="logo" onclick="showHome()">
+      <div class="logo-dot"></div>
+      NovaPulse
+    </a>
+    <nav>
+      <a href="#" onclick="filterCat('ai')">AI</a>
+      <a href="#" onclick="filterCat('tech')">Technology</a>
+      <a href="#" onclick="filterCat('africa')">Africa</a>
+      <a href="#" onclick="filterCat('business')">Business</a>
+      <a href="#" onclick="filterCat('finance')">Finance</a>
+      <a href="#" onclick="filterCat('religion')">Religion</a>
+      <a href="#" onclick="filterCat('viral')">Viral</a>
+    </nav>
+    <div class="header-actions">
+      <button class="btn-search" onclick="toggleSearch()" title="Search">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <a href="#" class="btn-signin">Sign in</a>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN VIEW -->
+<div class="main-view" id="mainView">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-badge fade-up"><div class="live-dot"></div> AI Newsroom · Publishing Now</div>
+        <h1 class="fade-up">The pulse of the <em>world,</em> written by AI.</h1>
+        <p class="hero-sub fade-up">NovaPulse listens to RSS feeds, social signals and trending APIs — then rewrites them into crisp, SEO-ready stories optimized for Google Discover. Faster than a feed. Sharper than the crowd.</p>
+        <div class="hero-ctas fade-up">
+          <a href="#articles" class="btn-primary">Read top stories</a>
+          <a href="#" class="btn-ghost" onclick="filterCat('ai')">Explore AI desk →</a>
+        </div>
+        <div class="hero-stats fade-up">
+          <div class="stat-item">
+            <div class="stat-num">2M+</div>
+            <div class="stat-label">Monthly readers</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">12+</div>
+            <div class="stat-label">Languages</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">&lt;1s</div>
+            <div class="stat-label">Publish latency</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-featured fade-up">
+        <div class="hero-feat-img">🤖</div>
+        <div class="hero-feat-body">
+          <div class="feat-cat">AI · Trending</div>
+          <h3>The AI Newsroom Rises: How Autonomous Editors Are Reshaping Discover</h3>
+          <p>A new generation of AI-first publishers is gaming Google Discover the right way — with speed, structure, and human-grade prose.</p>
+          <div class="feat-meta">
+            <span>Nova Desk</span>
+            <span>·</span>
+            <span>6 min read</span>
+            <span>·</span>
+            <span>Just now</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRENDING STRIP -->
+  <div class="trending-strip">
+    <div class="trending-inner">
+      <span class="trending-label">🔥 Trending</span>
+      <a href="#" class="trending-item" onclick="openArticle('ai-newsroom')"><span class="trending-num">01</span> AI Newsroom Rises</a>
+      <a href="#" class="trending-item" onclick="openArticle('africa-tech')"><span class="trending-num">02</span> Africa's Tech Surge</a>
+      <a href="#" class="trending-item" onclick="openArticle('viral-storm')"><span class="trending-num">03</span> Inside the Viral Storm</a>
+      <a href="#" class="trending-item" onclick="openArticle('markets-ai')"><span class="trending-num">04</span> Markets Rotate to AI</a>
+      <a href="#" class="trending-item" onclick="openArticle('silicon-race')"><span class="trending-num">05</span> The 1.4nm Race</a>
+    </div>
+  </div>
+
+  <!-- FEATURED SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Featured</h2>
+      <span class="section-label">Editor's picks</span>
+      <a href="#articles" class="section-more">See all stories →</a>
+    </div>
+    <div class="featured-row">
+      <a href="#" class="featured-big" onclick="openArticle('ai-newsroom')">
+        <div class="card-cat cat-ai"><div class="cat-dot"></div>AI · Breaking</div>
+        <h2>The AI Newsroom Rises: How Autonomous Editors Are Reshaping Google Discover</h2>
+        <p>A new generation of AI-first publishers is mastering Google Discover — not by gaming the algorithm, but by producing speed, structure, and genuine human-grade prose at machine scale. Inside the quiet revolution reshaping digital media.</p>
+        <div class="card-meta">
+          <span>Nova Desk</span>
+          <span>·</span>
+          <span>6 min read</span>
+          <span class="card-tag">Trending</span>
+        </div>
+      </a>
+      <div class="featured-stack">
+        <a href="#" class="stack-item" onclick="openArticle('africa-tech')">
+          <div class="card-cat cat-africa"><div class="cat-dot"></div>Africa</div>
+          <h4>Africa's Tech Surge: Lagos, Nairobi and Cape Town Lead the Next Wave</h4>
+          <p>Three cities driving a continental tech renaissance.</p>
+          <div class="card-meta"><span>5 min</span></div>
+        </a>
+        <a href="#" class="stack-item" onclick="openArticle('markets-ai')">
+          <div class="card-cat cat-finance"><div class="cat-dot"></div>Finance</div>
+          <h4>Markets Rotate Into AI Infrastructure as Rate Cuts Loom</h4>
+          <p>Smart money is repositioning ahead of the Fed pivot.</p>
+          <div class="card-meta"><span>4 min</span></div>
+        </a>
+        <a href="#" class="stack-item" onclick="openArticle('viral-storm')">
+          <div class="card-cat cat-viral"><div class="cat-dot"></div>Viral</div>
+          <h4>Inside the Viral Storm: How a 14-Second Clip Reached 80M in a Day</h4>
+          <p>The anatomy of a perfect viral moment.</p>
+          <div class="card-meta"><span>3 min</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTICLES GRID -->
+  <div class="section" id="articles">
+    <div class="section-header">
+      <h2 class="section-title">Latest Stories</h2>
+      <span class="section-label">Updated continuously</span>
+    </div>
+    <div class="cat-filters">
+      <button class="cat-btn active" onclick="filterCat('all', this)">All</button>
+      <button class="cat-btn" onclick="filterCat('ai', this)">AI</button>
+      <button class="cat-btn" onclick="filterCat('tech', this)">Technology</button>
+      <button class="cat-btn" onclick="filterCat('africa', this)">Africa</button>
+      <button class="cat-btn" onclick="filterCat('business', this)">Business</button>
+      <button class="cat-btn" onclick="filterCat('finance', this)">Finance</button>
+      <button class="cat-btn" onclick="filterCat('religion', this)">Religion</button>
+      <button class="cat-btn" onclick="filterCat('viral', this)">Viral</button>
+    </div>
+    <div class="articles-grid" id="articlesGrid">
+      <!-- AI -->
+      <a href="#" class="article-card" data-cat="ai" onclick="openArticle('ai-newsroom')">
+        <div class="card-cat cat-ai"><div class="cat-dot"></div>AI</div>
+        <h3>The AI Newsroom Rises: Autonomous Editors Reshape Media</h3>
+        <p>A new generation of AI-first publishers is mastering Google Discover — with speed, structure, and human-grade prose at machine scale.</p>
+        <div class="card-meta"><span>Nova Desk · 6 min</span><span class="card-tag">Trending</span></div>
+      </a>
+      <!-- Africa -->
+      <a href="#" class="article-card" data-cat="africa" onclick="openArticle('africa-tech')">
+        <div class="card-cat cat-africa"><div class="cat-dot"></div>Africa</div>
+        <h3>Africa's Tech Surge: Lagos, Nairobi & Cape Town Lead the Wave</h3>
+        <p>VC funding in Africa hit record highs in Q1 2026. Lagos, Nairobi and Cape Town are emerging as the continent's tech triumvirate.</p>
+        <div class="card-meta"><span>Nova Desk · 5 min</span><span class="card-tag">Hot</span></div>
+      </a>
+      <!-- Finance -->
+      <a href="#" class="article-card" data-cat="finance" onclick="openArticle('markets-ai')">
+        <div class="card-cat cat-finance"><div class="cat-dot"></div>Finance</div>
+        <h3>Markets Rotate Into AI Infrastructure as Rate Cuts Loom</h3>
+        <p>Smart money is repositioning ahead of the anticipated Federal Reserve pivot, with AI infrastructure stocks leading the rotation.</p>
+        <div class="card-meta"><span>Nova Desk · 4 min</span></div>
+      </a>
+      <!-- Tech -->
+      <a href="#" class="article-card" data-cat="tech" onclick="openArticle('silicon-race')">
+        <div class="card-cat cat-tech"><div class="cat-dot"></div>Technology</div>
+        <h3>Next-Gen Silicon: The Quiet Race to 1.4nm and What Comes After</h3>
+        <p>TSMC, Samsung, and Intel are locked in a sub-2nm war. The winner will define the next decade of computing.</p>
+        <div class="card-meta"><span>Nova Desk · 7 min</span><span class="card-tag">Deep Dive</span></div>
+      </a>
+      <!-- Viral -->
+      <a href="#" class="article-card" data-cat="viral" onclick="openArticle('viral-storm')">
+        <div class="card-cat cat-viral"><div class="cat-dot"></div>Viral</div>
+        <h3>Inside the Viral Storm: 80 Million Views in 24 Hours</h3>
+        <p>A 14-second clip rewrote the rules of virality. The anatomy of a perfect viral moment — and the algorithm behind it.</p>
+        <div class="card-meta"><span>Nova Desk · 3 min</span><span class="card-tag">Trending</span></div>
+      </a>
+      <!-- Business -->
+      <a href="#" class="article-card" data-cat="business" onclick="openArticle('business-ai')">
+        <div class="card-cat cat-business"><div class="cat-dot"></div>Business</div>
+        <h3>The Real ROI of AI Adoption in Mid-Market Business</h3>
+        <p>Beyond the hype: companies that invested in AI automation in 2024 are reporting 3-5x efficiency gains across operations.</p>
+        <div class="card-meta"><span>Nova Desk · 5 min</span></div>
+      </a>
+      <!-- Religion -->
+      <a href="#" class="article-card" data-cat="religion" onclick="openArticle('faith-tech')">
+        <div class="card-cat cat-religion"><div class="cat-dot"></div>Religion</div>
+        <h3>Faith & Technology: How AI is Reshaping Spiritual Communities</h3>
+        <p>From AI-generated sermons to virtual congregations — religious institutions are grappling with the digital transformation of faith.</p>
+        <div class="card-meta"><span>Nova Desk · 6 min</span></div>
+      </a>
+      <!-- AI 2 -->
+      <a href="#" class="article-card" data-cat="ai" onclick="openArticle('gpt5-impact')">
+        <div class="card-cat cat-ai"><div class="cat-dot"></div>AI</div>
+        <h3>The Language Model Wars: What GPT-5's Capabilities Mean for Every Industry</h3>
+        <p>As frontier models reach new capability thresholds, every sector from healthcare to law is being forced to reimagine its core workflows.</p>
+        <div class="card-meta"><span>Nova Desk · 8 min</span><span class="card-tag">Analysis</span></div>
+      </a>
+      <!-- Africa 2 -->
+      <a href="#" class="article-card" data-cat="africa" onclick="openArticle('afcfta')">
+        <div class="card-cat cat-africa"><div class="cat-dot"></div>Africa</div>
+        <h3>AfCFTA at Scale: How the African Free Trade Zone is Finally Delivering</h3>
+        <p>Three years after launch, the African Continental Free Trade Area is showing measurable impact on intra-continental commerce.</p>
+        <div class="card-meta"><span>Nova Desk · 5 min</span></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="newsletter-section">
+    <div class="newsletter-inner">
+      <div class="newsletter-left">
+        <h2>Stay in <em>the pulse.</em></h2>
+        <p>One daily digest. The world's most important AI, tech, Africa, and business stories — rewritten, summarized, and delivered before 8 AM. Zero spam, unsubscribe anytime.</p>
+      </div>
+      <div class="newsletter-form">
+        <input type="email" placeholder="your@email.com" />
+        <button type="button" onclick="subscribeNewsletter()">Join the pulse →</button>
+        <p class="form-note">Join 120,000+ readers. No spam. Daily digest only.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo" onclick="showHome()">
+          <div class="logo-dot"></div>
+          NovaPulse
+        </a>
+        <p>The AI-native newsroom. We listen to the world's signals and translate them into crisp, human-grade stories — faster than any traditional newsroom.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <ul>
+          <li><a href="#" onclick="filterCat('ai')">AI</a></li>
+          <li><a href="#" onclick="filterCat('tech')">Technology</a></li>
+          <li><a href="#" onclick="filterCat('africa')">Africa</a></li>
+          <li><a href="#" onclick="filterCat('business')">Business</a></li>
+          <li><a href="#" onclick="filterCat('finance')">Finance</a></li>
+          <li><a href="#" onclick="filterCat('religion')">Religion</a></li>
+          <li><a href="#" onclick="filterCat('viral')">Viral</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">API Access</a></li>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Push Alerts</a></li>
+          <li><a href="#">Advertise</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 NovaPulse AI. All signals reserved.</span>
+      <span>Built with AI · Optimized for Discover · <a href="#">novapulse-ai-hub.lovable.app</a></span>
+    </div>
+  </footer>
+
+</div><!-- /main-view -->
+
+<!-- ARTICLE VIEW -->
+<div class="article-page" id="articlePage">
+  <div class="article-header">
+    <div class="article-breadcrumb">
+      <a href="#" onclick="showHome()">NovaPulse</a>
+      <span>›</span>
+      <span id="articleCat"></span>
+      <span>›</span>
+      <span id="articleSlug"></span>
+    </div>
+    <div id="articleCatBadge" class="card-cat" style="margin-bottom:16px;font-size:11px;"></div>
+    <h1 id="articleTitle"></h1>
+    <p class="lead" id="articleLead"></p>
+    <div class="article-meta-bar">
+      <span>Nova Desk</span>
+      <span>·</span>
+      <span id="articleReadTime"></span>
+      <span>·</span>
+      <span id="articleDate"></span>
+    </div>
+  </div>
+  <div class="article-body" id="articleBody"></div>
+</div>
+
+<script>
+  const articles = {
+    'ai-newsroom': {
+      cat: 'AI', catClass: 'cat-ai', slug: 'ai-newsroom-rises',
+      title: 'The AI Newsroom Rises: How Autonomous Editors Are Reshaping Google Discover',
+      lead: 'A new generation of AI-first publishers is mastering Google Discover the right way — with speed, structure, and human-grade prose at machine scale.',
+      readTime: '6 min read', date: 'May 18, 2026',
+      body: `
+        <p>In newsrooms across the world, a quiet revolution is underway. While traditional publishers struggle with shrinking ad revenues and aging workflows, a new breed of AI-native media companies is pulling ahead — and Google Discover is rewarding them for it.</p>
+        <h2>Speed as a Competitive Moat</h2>
+        <p>The first generation of AI content was obvious. Thin, formulaic, stuffed with keywords. Google's algorithms caught on quickly. But the second generation — the one emerging now — is different. These systems don't just generate content; they understand context, audience, and narrative structure.</p>
+        <p>NovaPulse represents this new wave. By continuously monitoring RSS feeds, trending APIs, and social signal graphs, the platform identifies emerging stories before they peak — then reconstructs them into original, deeply-reported pieces that read like they were written by a veteran journalist.</p>
+        <blockquote>"The goal was never to replace journalists. It was to give every story the attention it deserves, at a speed that was previously impossible." — Nova Desk</blockquote>
+        <h2>Why Google Discover Favours AI-Native Publishers</h2>
+        <p>Google Discover's algorithm rewards recency, relevance, and engagement signals. AI newsrooms can publish within seconds of a story breaking. But speed alone doesn't win — the quality of the prose, the originality of the angle, and the accuracy of the information all factor into distribution.</p>
+        <p>Publishers that have mastered this balance are seeing dramatic results. Some report 300% increases in Discover-driven traffic within three months of launching AI-assisted workflows. The key is not outsourcing editorial judgment — it's augmenting it.</p>
+        <h2>The Road Ahead</h2>
+        <p>As multimodal AI systems improve, the next frontier is video and audio. Several NovaPulse competitors are already experimenting with AI-generated video news summaries optimized for YouTube Shorts and Instagram Reels. The race is accelerating, and the prize — global attention at scale — has never been larger.</p>
+        <p>For readers, this means more news, faster, and often better-explained than legacy media can deliver. For the industry, it means the competitive landscape has fundamentally shifted. The AI-native newsroom isn't the future. It's already here.</p>
+      `
+    },
+    'africa-tech': {
+      cat: 'Africa', catClass: 'cat-africa', slug: 'africa-tech-surge',
+      title: "Africa's Tech Surge: Lagos, Nairobi and Cape Town Lead the Next Wave",
+      lead: "VC funding in Africa hit record highs in Q1 2026. Three cities are emerging as the continent's defining tech capitals.",
+      readTime: '5 min read', date: 'May 18, 2026',
+      body: `
+        <p>For years, Africa's tech potential was described in terms of what it could become. In 2026, it's describing itself in terms of what it already is. Lagos, Nairobi, and Cape Town are no longer emerging tech hubs — they are established ones, attracting billions in investment and producing unicorns at a pace that is surprising even their biggest boosters.</p>
+        <h2>Lagos: The Giant Awakens</h2>
+        <p>Nigeria's commercial capital has long been considered Africa's most important startup ecosystem. But 2025 marked a turning point. Fintech giants born in Lagos — from Flutterwave to Paystack — have expanded across continents, while a new generation of B2B SaaS companies is targeting the continent's 1.4 billion consumers.</p>
+        <p>VC investment into Lagos-based startups reached $2.3 billion in 2025, a 78% increase from the year prior. More importantly, a growing share of that capital is now coming from local investors — a sign of ecosystem maturity.</p>
+        <h2>Nairobi: The Silicon Savannah Delivers</h2>
+        <p>Kenya's capital has long worn the "Silicon Savannah" label. In 2026, it's finally living up to it. The M-Pesa infrastructure that made Nairobi famous in fintech has become the foundation for an entirely new generation of companies — in agritech, healthtech, and climate technology.</p>
+        <blockquote>"Nairobi has the best developer talent density on the continent, and the infrastructure is finally catching up." — Leading pan-African VC</blockquote>
+        <h2>Cape Town: Africa's Design Capital Goes Deep Tech</h2>
+        <p>South Africa's Mother City was always known for its creative industries. But a surge in deep tech investment — particularly in AI, robotics, and biotech — is transforming its economic profile. Cape Town now hosts more AI research labs per capita than any other African city.</p>
+        <p>Together, these three cities are building something unprecedented: an interconnected, continent-spanning technology ecosystem that is developing its own models, its own capital networks, and its own global ambitions.</p>
+      `
+    },
+    'markets-ai': {
+      cat: 'Finance', catClass: 'cat-finance', slug: 'markets-ai-infrastructure',
+      title: 'Markets Rotate Into AI Infrastructure as Rate Cuts Loom',
+      lead: 'Smart money is repositioning ahead of the anticipated Federal Reserve pivot, with AI infrastructure plays leading the charge.',
+      readTime: '4 min read', date: 'May 18, 2026',
+      body: `
+        <p>As Federal Reserve signals shift toward accommodation, institutional investors are making a clear bet: AI infrastructure is the trade of the cycle. Data center operators, power utilities serving AI campuses, and semiconductor equipment makers are all seeing outsized inflows as portfolio managers rotate out of rate-sensitive assets.</p>
+        <h2>The Infrastructure Trade</h2>
+        <p>Unlike the speculative AI wave of 2023, this rotation is grounded in earnings. The companies building and powering AI compute — from hyperscale data centers to the transmission infrastructure feeding them — are reporting quarterly results that consistently exceed analyst estimates.</p>
+        <p>Power demand from AI data centers is expected to triple by 2028, creating a multi-decade investment thesis in electricity generation, grid infrastructure, and cooling technology. Investors who missed the GPU trade are now positioning in the picks-and-shovels plays that underpin it.</p>
+        <blockquote>"This isn't speculative. The capex numbers from the hyperscalers confirm the demand. We're building positions in the physical layer of AI." — Senior portfolio manager, major sovereign wealth fund</blockquote>
+        <h2>Rate Cut Catalysts</h2>
+        <p>The anticipated Fed pivot adds a tailwind to an already compelling fundamental story. Lower rates reduce the discount rate applied to long-duration assets, making infrastructure investments with 20-year earnings profiles significantly more attractive on a present-value basis.</p>
+        <p>For retail investors, the message from institutional positioning is clear: the AI trade is not over. It's moving down the stack, from applications to infrastructure, from software to silicon to steel.</p>
+      `
+    },
+    'viral-storm': {
+      cat: 'Viral', catClass: 'cat-viral', slug: 'viral-trend-storm',
+      title: 'Inside the Viral Storm: How a 14-Second Clip Reached 80 Million in a Day',
+      lead: 'The anatomy of a perfect viral moment — and what it reveals about how attention works in 2026.',
+      readTime: '3 min read', date: 'May 17, 2026',
+      body: `
+        <p>It started with a phone camera, a moment of unexpected human connection, and a 14-second clip that somehow captured something true about the world. Within 24 hours, 80 million people had watched it. Within 48, it had spawned a thousand imitations and been referenced by three heads of state.</p>
+        <h2>The Formula — If There Is One</h2>
+        <p>Virality is notoriously difficult to engineer, but researchers who study it have identified recurring elements in clips that consistently break through: surprise, emotional resonance, brevity, and universal legibility — the sense that you understand it immediately, regardless of language or culture.</p>
+        <p>The clip in question hit all four. It was unexpected. It made you feel something. It was short enough to rewatch. And it required no explanation.</p>
+        <h2>The Algorithm's Role</h2>
+        <p>TikTok's recommendation engine played a decisive role in the clip's trajectory. Early engagement signals — completion rate, shares, comments — triggered aggressive distribution within the first two hours. Once a critical mass of diverse demographics had engaged, the algorithm classified it as a cultural moment and pushed it to its full audience.</p>
+        <blockquote>"The algorithm didn't create the virality. It amplified something that was already working. That's the part most people misunderstand." — Platform researcher</blockquote>
+        <p>For brands and creators attempting to replicate the phenomenon, the lesson is uncomfortable: the formula helps, but the spark has to be real. Audiences in 2026 are too sophisticated to mistake manufactured emotion for the genuine article.</p>
+      `
+    },
+    'silicon-race': {
+      cat: 'Technology', catClass: 'cat-tech', slug: 'next-gen-silicon',
+      title: 'Next-Gen Silicon: The Quiet Race to 1.4nm and What Comes After',
+      lead: 'TSMC, Samsung, and Intel are locked in a sub-2nm war. The winner will define the next decade of computing.',
+      readTime: '7 min read', date: 'May 17, 2026',
+      body: `
+        <p>In the physics of semiconductors, every generation of miniaturization is supposed to be the last. The atoms, the quantum effects, the heat — surely, at some point, the laws of physics will put a stop to Moore's Law. That point keeps not arriving. Instead, the three giants of global chip manufacturing are racing toward 1.4 nanometer processes that would have seemed fantastical five years ago.</p>
+        <h2>The Contenders</h2>
+        <p>TSMC remains the leader, with its N2P process expected to enter volume production by late 2026. Samsung is pushing its SF1.4 process as a more aggressive alternative, sacrificing some yield for higher transistor density. Intel, having rebuilt its manufacturing credibility with the successful 18A node, is now publicly promising 14A by 2027.</p>
+        <p>The stakes are enormous. Whoever controls the leading edge of semiconductor manufacturing controls the hardware that runs artificial intelligence — and by extension, exerts significant influence over the geopolitical and economic future of the digital economy.</p>
+        <h2>Beyond Silicon</h2>
+        <p>Perhaps more interesting than the race itself is what comes after. Research groups at MIT, IMEC, and several Chinese universities are publishing promising results on carbon nanotube transistors, 2D material-based devices, and optical computing architectures that could eventually succeed silicon entirely.</p>
+        <p>The timeline for commercializing these technologies remains uncertain — a decade at minimum. But the research momentum is accelerating, driven by the recognition that silicon's limits, while not yet reached, are now visible on the horizon.</p>
+      `
+    },
+    'business-ai': {
+      cat: 'Business', catClass: 'cat-business', slug: 'business-ai-adoption',
+      title: 'The Real ROI of AI Adoption in Mid-Market Business',
+      lead: 'Beyond the hype: companies that invested in AI automation in 2024 are now reporting hard numbers.',
+      readTime: '5 min read', date: 'May 16, 2026',
+      body: `
+        <p>When CFOs demanded to know the ROI of AI investments in 2023, the honest answer was often: we're not sure yet. Two years later, the data is in — and for mid-market companies that made focused, well-implemented AI investments, the returns are significant and measurable.</p>
+        <h2>Where the Returns Are Showing Up</h2>
+        <p>The biggest gains are appearing in three areas: customer service automation, internal knowledge management, and sales process optimization. Companies that deployed AI-assisted customer support report 40-60% reductions in ticket resolution time. Those that implemented internal AI knowledge bases report that employees spend 30% less time searching for information.</p>
+        <p>Sales teams using AI-powered lead scoring and outreach tools are reporting 25-40% improvements in conversion rates — not because the AI is replacing sales judgment, but because it's allowing salespeople to spend more time on the highest-probability opportunities.</p>
+        <blockquote>"We were skeptical. We thought AI was a large-company thing. But the off-the-shelf tools have gotten good enough that any company our size can benefit." — CEO, $200M revenue manufacturing firm</blockquote>
+        <h2>The Implementation Gap</h2>
+        <p>The caveat in all this good news is the implementation gap. Companies that are seeing strong ROI share common characteristics: clear use-case definition before deployment, adequate training investment, and executive sponsorship. Companies that deployed AI without these foundations are largely reporting disappointment.</p>
+        <p>For mid-market executives still on the fence, the message from the data is unambiguous: the technology works. The question is no longer whether to invest, but how to invest well.</p>
+      `
+    },
+    'faith-tech': {
+      cat: 'Religion', catClass: 'cat-religion', slug: 'faith-technology',
+      title: 'Faith & Technology: How AI is Reshaping Spiritual Communities',
+      lead: 'From AI-generated sermons to virtual congregations, religious institutions are navigating the digital transformation of faith.',
+      readTime: '6 min read', date: 'May 16, 2026',
+      body: `
+        <p>For most of human history, religious experience has been defined by physical gathering — bodies in a shared space, voices in unison, the tangible presence of community. Technology has been slowly challenging this model for decades. AI is challenging it fundamentally.</p>
+        <h2>The AI Sermon</h2>
+        <p>Several megachurches in the United States and South Korea have begun experimenting with AI-assisted sermon preparation. The results are controversial. Critics argue that the spiritual authenticity of a message is inseparable from the human struggle of its creation. Proponents counter that AI tools help pastors research more deeply and communicate more clearly — that the technology serves the message, not replaces it.</p>
+        <p>A handful of communities have gone further, deploying fully AI-generated spiritual content for online audiences. The response from congregants has been surprisingly receptive, particularly among younger demographics who report feeling less judged engaging with AI-mediated spiritual content.</p>
+        <h2>Virtual Congregations</h2>
+        <p>The pandemic normalized remote religious participation. AI is now making it richer. Virtual reality congregations with AI-powered avatars, personalized spiritual guidance chatbots, and AI-curated scripture study tools are all growing in adoption, particularly in diaspora communities separated from their home religious cultures.</p>
+        <blockquote>"Technology doesn't change what faith is. It changes how we practice it. That's happened with every major communication technology in history." — Theologian and digital ethics researcher</blockquote>
+        <p>The deeper question — whether AI can or should mediate humanity's relationship with the transcendent — is one that religious thinkers are only beginning to grapple with. The answers will define not just the future of religion, but the future of meaning-making in an AI-saturated world.</p>
+      `
+    },
+    'gpt5-impact': {
+      cat: 'AI', catClass: 'cat-ai', slug: 'gpt5-industry-impact',
+      title: "The Language Model Wars: What GPT-5's Capabilities Mean for Every Industry",
+      lead: 'As frontier models reach new capability thresholds, every sector is being forced to reimagine its core workflows.',
+      readTime: '8 min read', date: 'May 15, 2026',
+      body: `
+        <p>Frontier language models have been improving steadily for years. But capability jumps don't distribute evenly across time — they cluster, and when they cluster, entire industries are forced to reassess assumptions that had seemed permanent.</p>
+        <h2>The Benchmark Breakthroughs</h2>
+        <p>The latest generation of frontier models is posting human-expert-level performance on professional licensing exams across medicine, law, engineering, and finance. This isn't the story anymore — it's the baseline. The new story is performance on tasks that previously required not just knowledge but judgment: complex multi-step reasoning, navigating ambiguous information, adapting to novel contexts.</p>
+        <h2>Industry by Industry</h2>
+        <p>In law, AI-assisted contract review has moved from novelty to standard practice at major firms. The question is no longer whether to use it, but which workflows still require senior human judgment. In medicine, diagnostic AI is being deployed in radiology and pathology at scale, with human oversight requirements being carefully — and sometimes controversially — recalibrated.</p>
+        <p>In financial services, AI is writing research reports, analyzing earnings calls, and generating investment theses. The role of the junior analyst is changing faster than most banks had anticipated. In education, AI tutors are delivering personalized instruction at a quality level that is prompting serious questions about the future of the classroom model.</p>
+        <blockquote>"The question isn't whether your industry will be transformed. It's whether you'll be the one doing the transforming." — Managing director, global technology consultancy</blockquote>
+        <h2>The Acceleration Problem</h2>
+        <p>What makes this moment different from previous technology transitions is the rate of improvement. When prior general-purpose technologies — electricity, computers, the internet — transformed industries, they did so over decades, giving institutions time to adapt. AI capability is improving on a timeline measured in months. The adaptation challenge is unprecedented.</p>
+      `
+    },
+    'afcfta': {
+      cat: 'Africa', catClass: 'cat-africa', slug: 'afcfta-delivering',
+      title: 'AfCFTA at Scale: How the African Free Trade Zone is Finally Delivering',
+      lead: 'Three years after full launch, the African Continental Free Trade Area is showing measurable impact on intra-continental commerce.',
+      readTime: '5 min read', date: 'May 15, 2026',
+      body: `
+        <p>When the African Continental Free Trade Area began operations in January 2021, skeptics noted the gap between ambition and infrastructure. Roads, ports, digital payment systems, and regulatory harmonization all needed to catch up to the treaty's promise. In 2026, the catch-up is well underway — and the numbers are starting to reflect it.</p>
+        <h2>Trade Flows Shift</h2>
+        <p>Intra-African trade as a percentage of total African trade has grown from 14% in 2020 to 21% in 2025. That sounds modest until you account for the absolute size of African economies — and until you compare it to intra-regional trade figures for other developing-economy blocs at comparable stages of integration.</p>
+        <p>The sectors showing the most momentum are manufacturing, agro-processing, and financial services. African-made consumer goods are reaching consumers across the continent in ways that were commercially unviable five years ago, thanks to improved logistics infrastructure and reduced tariff friction.</p>
+        <h2>The Digital Trade Acceleration</h2>
+        <p>Perhaps the most underappreciated driver of AfCFTA progress is digital trade. Cross-border e-commerce, digital financial services, and software exports don't face the same physical infrastructure constraints as goods trade — and they're growing at remarkable rates. Platforms built in Lagos are serving customers in Cairo. Software companies in Nairobi are selling to clients in Johannesburg.</p>
+        <blockquote>"The physical trade gains are real and important. But the digital trade story is where the transformational potential is clearest." — Senior economist, African Development Bank</blockquote>
+        <p>The challenges that remain are real: non-tariff barriers, regulatory complexity, and infrastructure gaps still frustrate traders across the continent. But the direction of travel is clear. Africa's economic integration, long promised and long delayed, is finally accumulating evidence of genuine progress.</p>
+      `
+    }
+  };
+
+  function openArticle(id) {
+    const a = articles[id];
+    if (!a) return;
+    document.getElementById('mainView').classList.add('hidden');
+    document.getElementById('articlePage').classList.add('active');
+    document.getElementById('articleCat').textContent = a.cat;
+    document.getElementById('articleSlug').textContent = a.slug;
+    document.getElementById('articleCatBadge').innerHTML = `<div class="cat-dot" style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;margin-right:6px;"></div>${a.cat}`;
+    document.getElementById('articleCatBadge').className = 'card-cat ' + a.catClass;
+    document.getElementById('articleTitle').textContent = a.title;
+    document.getElementById('articleLead').textContent = a.lead;
+    document.getElementById('articleReadTime').textContent = a.readTime;
+    document.getElementById('articleDate').textContent = a.date;
+    document.getElementById('articleBody').innerHTML = a.body;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return false;
+  }
+
+  function showHome() {
+    document.getElementById('mainView').classList.remove('hidden');
+    document.getElementById('articlePage').classList.remove('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return false;
+  }
+
+  function filterCat(cat, btn) {
+    showHome();
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    const cards = document.querySelectorAll('.article-card');
+    cards.forEach(card => {
+      if (cat === 'all' || card.dataset.cat === cat) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    setTimeout(() => {
+      document.getElementById('articles').scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    return false;
+  }
+
+  function subscribeNewsletter() {
+    const input = document.querySelector('.newsletter-form input');
+    const btn = document.querySelector('.newsletter-form button');
+    if (input.value && input.value.includes('@')) {
+      btn.textContent = '✓ You\'re in the pulse!';
+      btn.style.background = '#3a8a3a';
+      input.disabled = true;
+    } else {
+      input.style.borderColor = 'var(--accent2)';
+      input.placeholder = 'Enter a valid email address';
+    }
+  }
+
+  function toggleSearch() {
+    // Simple search toggle placeholder
+    alert('Search coming soon — building the pulse…');
+  }
+</script>
+</body>
+</html>
